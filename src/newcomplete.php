@@ -87,21 +87,21 @@ else {
 
     $tags = [];
     if ($settings['random_tags']) {
-      $stmt = $db->prepare("SELECT id FROM tag WHERE category = 1 ORDER BY RAND()");
+      $stmt = $db->prepare("SELECT id FROM tag WHERE category = 1 ORDER BY RANDOM()");
       $stmt->execute();
       if ($stmt->rowCount() > 0) {
         $row = $stmt->fetch();
         $tags[] = $row[0];
       }
 
-      $stmt = $db->prepare("SELECT id FROM tag WHERE category = 2 ORDER BY RAND()");
+      $stmt = $db->prepare("SELECT id FROM tag WHERE category = 2 ORDER BY RANDOM()");
       $stmt->execute();
       if ($stmt->rowCount() > 0) {
         $row = $stmt->fetch();
         $tags[] = $row[0];
       }
 
-      $stmt = $db->prepare("SELECT id FROM tag WHERE category = 3 ORDER BY RAND()");
+      $stmt = $db->prepare("SELECT id FROM tag WHERE category = 3 ORDER BY RANDOM()");
       $stmt->execute();
       if ($stmt->rowCount() > 0) {
         $row = $stmt->fetch();

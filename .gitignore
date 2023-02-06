@@ -7,3 +7,7 @@ src/generate.php
 src/generate.txt
 src/connexion.php
 deploy.php
+tmp/game_timestamp.txt
+tmp/settings_timestamp.txt
+tmp/settings.txt
+mydb.sqlite3

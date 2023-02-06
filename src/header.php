@@ -1,6 +1,6 @@
 <?php
-require_once "connexion.php";
-require "variables.php";
+  require_once "connexion.php";
+  require "variables.php";
 ?>
 <!DOCTYPE html>
 <html<?php if (isset($page_id)){ echo ' id="'.$page_id.'"'; } ?> lang="fr">

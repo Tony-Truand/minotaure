@@ -1,4 +1,5 @@
 <?php
+
 $page_id = 'page-index';
 include 'header.php';
 ?>

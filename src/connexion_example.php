@@ -5,6 +5,7 @@ $dbname = ''; // Name.
 $port = 3306; // Port.
 $login = ''; // Login.
 $mdp = ''; // Password.
+$dbEngine = 'mysql';
 
 /*
 Fill the location of your temporary files folder.
@@ -23,7 +24,11 @@ $languages = [
 */
 
 try {
-  $db = new PDO("mysql:host=$host:$port;dbname=$dbname", $login, $mdp);
+  if($dbEngine === 'sqlite') {
+    $db = new PDO("$dbEngine:$host");
+  } else {
+    $db = new PDO("$dbEngine:host=$host:$port;dbname=$dbname", $login, $mdp);
+  }
   $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 }
 catch (PDOException $e) {

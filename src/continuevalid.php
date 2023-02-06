@@ -12,7 +12,7 @@ $stmt->execute([
 ]);
 $row = $stmt->fetch();
 $id = $hp = $mdp_hash = "";
-if ($stmt->rowCount() > 0) {
+if (isset($row)) {
   $id = $row[0];
   $hp = $row[1];
   $wp = $row[2];

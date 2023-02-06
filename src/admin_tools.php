@@ -3,6 +3,8 @@
  * Contient toutes les fonctions utilisées par l'écran du MJ
  */
 
+use Exception;
+
 function admin_only() {
   if ($_SESSION['id'] != 1) {
     include "header.php";
@@ -71,19 +73,22 @@ function save_new_settings($post, $tmp_path) {
 function delete_tag_category($db, $category_id) {
   if (is_numeric($category_id)) {
     // Suppression des liaisons personnages / tags.
-    $query = $db->prepare("
-    DELETE character_tag 
-    FROM character_tag
-    LEFT JOIN tag ON tag.id = character_tag.id_tag
-    WHERE tag.category = :id_category
-    ");
-    $query->execute([':id_category' => $category_id]);
-    // Suppression des tags.
-    $query = $db->prepare("DELETE FROM tag WHERE category = :id_category");
-    $query->execute([':id_category' => $category_id]);
-    unset($_SESSION['default_raw_tags']);
-    unset($_SESSION['default_tags_per_category']);
-    unset($_SESSION['default_tags']);
+    try{
+      $query = $db->prepare("
+      DELETE FROM character_tag where id_tag in (select id from tag WHERE category = :id_category)
+      -- INNER JOIN tag ON tag.id = character_tag.id_tag
+      -- WHERE tag.category = :id_category
+      ");
+      $query->execute([':id_category' => $category_id]);
+      // Suppression des tags.
+      $query = $db->prepare("DELETE FROM tag WHERE category = :id_category");
+      $query->execute([':id_category' => $category_id]);
+      unset($_SESSION['default_raw_tags']);
+      unset($_SESSION['default_tags_per_category']);
+      unset($_SESSION['default_tags']);
+    } catch(Exception $e) {
+      die($e);
+    }
   }
 }
 
@@ -120,7 +125,7 @@ function add_new_tags($db, $post) {
         WHERE hrpg.hp > 0 
         AND hrpg.wp > 0
         AND hrpg.id > 1
-        ORDER BY RAND()
+        ORDER BY RANDOM()
       ");
       $results_players = $query->fetchAll(PDO::FETCH_COLUMN);
 
@@ -432,10 +437,10 @@ function elect_player($db, $role) {
   destitute_player($db, $role);
   
   // Attribution à un compte parmi personnages actifs
-  $sql = "SELECT id, nom FROM hrpg WHERE hp > 0 AND wp > 0 AND id > 1 AND active = 1 AND '.$role.' = 0 ORDER BY RAND() LIMIT 1";
+  $sql = "SELECT id, nom FROM hrpg WHERE hp > 0 AND wp > 0 AND id > 1 AND active = 1 AND $role = 0 ORDER BY RANDOM() LIMIT 1";
   $query = $db->query($sql);
   $elected = $query->fetch(PDO::FETCH_ASSOC);
-  if ($query->rowCount() > 0) {
+  if (is_array($elected)) {
     $sql = 'UPDATE hrpg SET ' . $role . '=1,lastlog="' . time() . '",log="Vous êtes ' . $role_name . '." WHERE id="' . $elected['id'] . '"';
     $db->query($sql);
     $_SESSION[$role] = $elected['nom'];
@@ -494,7 +499,7 @@ function random_player($db, $post) {
   }
   $limit = (is_numeric($post['limit']) && !empty($post['limit'])) ? $post['limit'] : 1;
 
-  $query = $db->query($query_str . ' WHERE hp > 0 AND wp > 0 AND id > 1 AND active = 1' . $where_add . ' ORDER BY RAND() LIMIT ' . $limit);
+  $query = $db->query($query_str . ' WHERE hp > 0 AND wp > 0 AND id > 1 AND active = 1' . $where_add . ' ORDER BY RANDOM() LIMIT ' . $limit);
   $rows = $query->fetchAll(PDO::FETCH_COLUMN);
   if (empty($rows)) {
     return '<script>players_chosen = false;</script>';
